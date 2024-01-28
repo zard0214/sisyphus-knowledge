@@ -7,7 +7,7 @@ tag:
 
 > 
 >
-> Reference:<https://cloud.tencent.com/developer/article/1755526>， https://velog.io/@impala/JAVA-JVM-Runtime-Data-Area
+> Reference:<https://cloud.tencent.com/developer/article/1755526 https://velog.io/@impala/JAVA-JVM-Runtime-Data-Area  https://medium.com/javarevisited/understanding-garbage-collection-algorithms-in-java-6d6e7ddf5272 https://blogs.oracle.com/javamagazine/post/java-garbage-collectors-evolution?source=post_page-----6d6e7ddf5272-------------------------------->
 > 
 java中就虚拟机是其他语言编写的(C语言+汇编语言，因此，JVM最常出现的攻击就是buffer overflow)，如javac命令等，而java api是java写的，大多开源在openjdk，jdk中有一个src.jar，就是JDk的源码，本文是JVM基础知识的一个汇总，方便查阅，内容较多。
 
@@ -191,9 +191,56 @@ JDK 1.8 的时候，方法区(HotSpot 的永久代)被彻底移除了(JDK1.7 就
 3. Full GC触发的过程：老年代满了而无法容纳更多的对象，会触发Full GC，Full GC 清理整个内存堆，包括年轻代和老年代。
 
 ### Garbage collection algorithm GC算法
-### GC的回收器
+
+1. Mark-Sweep 标记-清除
+2. Copying 复制
+3. Mark-Compact 标记-整理算法
+4. Generational Collection 分代收集算法
+
+### GC的回收器(JDK 18 中的 OpenJDK GC)
+
+![img_5.png](img_5.png)
+
+1. Parallel (< Java8)
+
+    并行 GC 是 JDK 8 及更早版本的默认收集器。它尝试以更紧凑的形式将对象从堆中的一个位置复制到另一个位置，以便我们可以在内存中拥有更多空间。有一个概念称为“停止世界”(STW) 暂停。当有新的请求等待，并且由于堆没有任何空间而没有可分配的内存时，会触发 STW 暂停。在这种情况下，JVM 将完全停止应用程序，并专注于运行 GC 算法，所有线程和进程都专用于 GC。一旦Heap中的空间被清理干净，JVM就会为请求的对象分配空间，并最终继续执行应用程序。该算法通过尝试在一个时间单位内完成更多工作来关注吞吐量，同时尽量减少对延迟（暂停）的关注。它使用多线程来完成工作，并且通常需要更长的暂停时间，因为它注重吞吐量。每次暂停的时间都会更长，并且在这些较长的暂停期间会收集垃圾。因此，延迟会受到影响，因为应用程序请求必须在这些暂停期间等待。
+    
+    通过对 JVM 使用以下命令或在 JVM 启动脚本中使用它，可以选择并行 GC 作为默认 GC 算法：
+
+        java -XX:+UseParallelGC com.mypackages.MyExecutableClass
+        java -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
+        java -XX:+UseParallelGC -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
+    
+
+2. Garbage First (> Java9)
+
+   G1 GC 是 Java9 及更高版本中使用的默认算法。 G1 同样关注吞吐量和延迟。
+   Stop the World 概念 -基本上是暂停应用程序一段时间，以便垃圾收集可以工作。该算法使用“停止世界”(STW) 暂停，但使暂停更短，以便可以减少延迟，即请求/操作不必等待更长时间才能完成。
+   缩短暂停时间意味着 GC 算法的工作时间非常短，以便应用程序可以顺利运行，而最终用户不会注意到这些暂停。
+
+   G1 与应用程序并发执行这项冗长的工作，即在应用程序使用多个线程运行时。这显着减少了最大暂停时间，但代价是一些整体吞吐量。
+
+   这个G1算法很稳定，非常成熟，并且一直在升级，有更新的想法。您可以请求此算法中的 stop-the-world 暂停时间不超过 x 毫秒。 G1 的关键设计目标之一是使由于垃圾收集而导致的停止世界暂停的持续时间和分布可预测和可配置。分代垃圾收集在切换该角色的两个性能指标（吞吐量和延迟）方面发挥着关键作用。 G1 的作用是，它将堆内存分为 2 部分：1. 年轻代 (Young Generation) 2. 老年代 (Old Generation)。分配给 Old 代的内存空间比 Young 代要多得多。活动时间较长的对象会从年轻代移动到老生代，即当一个对象在一定次数的 GC 中幸存下来时，收集器会将其移动到老生代。较新的对象最初分配给年轻内存。这意味着年轻代中拥有临时或短命对象的概率更高。说得通 ？因为长期以来一直处于活动状态的所有对象都将驻留在旧的内存位置中。因此，每当 G1 垃圾收集运行时，检查年轻代内存是合乎逻辑的。因此，我们将从年轻内存中释放空间，并且该空间可以分配给新的请求和操作。
+
+   然而，老一代内存最终会被填满。为了解决这个问题，G1 GC 算法使用分代垃圾收集，这意味着它会检查完整的年轻代内存以进行 GC，但对老一代内存使用增量方法。由于老一代内存会包含更多的活动对象（当前正在被应用程序使用），因此如果没有分代垃圾收集的概念，针对该内存的 GC 所花费的时间会相对较长。
+
+3. Z Garbage collector (JDK15)
+4. Shenandoah (JDK12)
+
+   ZGC 和 Shenandoah GC更喜欢通过补偿吞吐量来将延迟作为目标。他们尝试在没有明显停顿的情况下完成所有垃圾收集工作。它们首先分别作为非实验版本在 JDK 15 和 JDK 12 中引入
+
+5. Serial
+
+   Serial GC顾名思义是串行的，也就是说它只使用 1 个线程来完成 STW（Stop The World）工作。它无法利用多处理器硬件。该 GC 算法可用于小型、短时间运行的应用程序，因为它方法简单且没有复杂性规则。 Java5 和 Java6 使用了该算法。
+
 ### JVM的优化
 ### JVM的内存分析工具 
+
+1. jprofiler
+2. Arthas
+3. JVM自带的内存分析小工具: jconsole、jhat、jmap、jstack、jstat、jstatd、jvisualvm
+4. Linux工具: pidstat、vmstat、iostat
+
 ### 对象的创建
 ### 对象的内存布局
 ### 类加载器、反射、双亲委派
