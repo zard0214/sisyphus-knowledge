@@ -7,7 +7,7 @@ tag:
 
 > 
 >
-> Reference: https://cloud.tencent.com/developer/article/1755526 https://velog.io/@impala/JAVA-JVM-Runtime-Data-Area  https://medium.com/javarevisited/understanding-garbage-collection-algorithms-in-java-6d6e7ddf5272 https://blogs.oracle.com/javamagazine/post/java-garbage-collectors-evolution?source=post_page-----6d6e7ddf5272--------------------------------
+> Reference: https://lotabout.me/2021/Java-GC-Overview/ https://cloud.tencent.com/developer/article/1755526 https://velog.io/@impala/JAVA-JVM-Runtime-Data-Area  https://medium.com/javarevisited/understanding-garbage-collection-algorithms-in-java-6d6e7ddf5272 https://blogs.oracle.com/javamagazine/post/java-garbage-collectors-evolution?source=post_page-----6d6e7ddf5272--------------------------------
 > 
 java中就虚拟机是其他语言编写的(C语言+汇编语言，因此，JVM最常出现的攻击就是buffer overflow)，如javac命令等，而java api是java写的，大多开源在openjdk，jdk中有一个src.jar，就是JDk的源码，本文是JVM基础知识的一个汇总，方便查阅，内容较多。
 
@@ -355,5 +355,14 @@ i、Class.forName(全类名)
 ii、类名.class
 
 iii、对象名.getClass();
+
+
+标记用的三色算法，它是树遍历的一个抽象描述，有助于理解和讨论
+回收用的 Sweep, Compact, Copy 三种策略和各自的优缺点
+分代假设：越年轻的对象越可能死亡，越老的对象越可能活得久。GC 算法可以通过分代来提高性能
+为了减少停顿时间，GC 算法引入了并发标记和并发回收，而它们本身又引入了新的问题
+并发标记的问题介绍了 Incremental Update 和 Snapshot at The Beginning，分别打破引发问题的两个必要条件的一个
+并发回收问题介绍了 Shenandoah GC 使用的 Brooks Pointer 和 ZGC 使用的策略。
+最后简单讨论了 GC 算法对应用程序本身的影响。
 
 
