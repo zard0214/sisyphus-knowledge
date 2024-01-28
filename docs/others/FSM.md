@@ -173,6 +173,7 @@ AbstractExecutionService#doExecute
 
 ### sateless4j
 
+
 特点
 
 1. sateless4j是C#版本FSM的Java实现，代码量很少，不到30个类。
@@ -180,4 +181,21 @@ AbstractExecutionService#doExecute
 2. StateMachine轻量，比squirrel创建实例代价还要小。
 
 3. 支持基本的事件迁移，exit/entry action、guard、dynamic permit(根据自定义的condition来控制状态的迁移)。
+
+### statefulj
+
+### easy-states
+
+### JState
+
+## Conclusion
+
+### 功能对比
+
+spring-statemachine > squirrel > stateless4j > JState > easy-states
+
+
+### 上手难度和代码改动量
+
+easy-states ≈ stateless4j < JState < squirrel < spring-statemachine
 

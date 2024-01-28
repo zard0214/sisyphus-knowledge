@@ -210,7 +210,6 @@ JDK 1.8 的时候，方法区(HotSpot 的永久代)被彻底移除了(JDK1.7 就
         java -XX:+UseParallelGC com.mypackages.MyExecutableClass
         java -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
         java -XX:+UseParallelGC -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
-    
 
 2. Garbage First (> Java9)
 
