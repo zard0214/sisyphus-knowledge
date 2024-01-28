@@ -7,7 +7,7 @@ tag:
 
 > 
 >
-> Reference:<https://cloud.tencent.com/developer/article/1755526 https://velog.io/@impala/JAVA-JVM-Runtime-Data-Area  https://medium.com/javarevisited/understanding-garbage-collection-algorithms-in-java-6d6e7ddf5272 https://blogs.oracle.com/javamagazine/post/java-garbage-collectors-evolution?source=post_page-----6d6e7ddf5272-------------------------------->
+> Reference: https://cloud.tencent.com/developer/article/1755526 https://velog.io/@impala/JAVA-JVM-Runtime-Data-Area  https://medium.com/javarevisited/understanding-garbage-collection-algorithms-in-java-6d6e7ddf5272 https://blogs.oracle.com/javamagazine/post/java-garbage-collectors-evolution?source=post_page-----6d6e7ddf5272--------------------------------
 > 
 java中就虚拟机是其他语言编写的(C语言+汇编语言，因此，JVM最常出现的攻击就是buffer overflow)，如javac命令等，而java api是java写的，大多开源在openjdk，jdk中有一个src.jar，就是JDk的源码，本文是JVM基础知识的一个汇总，方便查阅，内容较多。
 
