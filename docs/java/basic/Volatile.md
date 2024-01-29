@@ -7,7 +7,7 @@ tag:
 
 >
 >
-> Reference: https://lotabout.me/2019/Java-volatile-keyword/
+> Reference: https://lotabout.me/2019/Java-volatile-keyword/ https://www.cnblogs.com/cxy2020/p/12951333.html
 >
 
 ## 1、Volatile (不稳定的)
@@ -179,3 +179,7 @@ tag:
 volatile 的作用，简单理解是强制在内存读写数据，但由于 happens-before 规则的限制，JVM 的实现需要做一些额外的工作，主要是对所有可见变量的强制读写（到内存）及限制指令重排。
 
 另外提一下，volatile 不能保证原子性，而 synchronized 可以。不过 synchronized 保证是的 synchronized 块之间的原子性、可见性、有序性，但是并不保证和那些非 synchronized 块的关系[3]，这也是不加 volatile 的 double-checked locking 失效[4]的原因之一。
+
+每个线程操作数据的时候会把数据从主内存读取到自己的工作内存，如果他操作了数据并且写会了，他其他已经读取的线程的变量副本就会失效了，需要都数据进行操作又要再次去主内存中读取了。
+
+volatile保证不同线程对共享变量操作的可见性，也就是说一个线程修改了volatile修饰的变量，当修改写回主内存时，另外一个线程立即看到最新的值。
