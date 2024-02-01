@@ -7,7 +7,7 @@ tag:
 
 >
 >
-> Reference: https://en.wikipedia.org/wiki/Binary_tree https://www.jianshu.com/p/8dfe95ee3825 https://oi-wiki.org/ds/rbtree/
+> Reference: https://en.wikipedia.org/wiki/Binary_tree https://www.jianshu.com/p/8dfe95ee3825 https://oi-wiki.org/ds/rbtree/ https://juejin.cn/post/6844903957563703309
 >
 
 ### 二叉树(binary tree)
@@ -142,6 +142,8 @@ tag:
 
 由于红黑树是目前主流工业界综合效率最高的内存型平衡树，其在实际的工程项目中有着广泛的使用，这里列举几个实际的使用案例并给出相应的源码链接，以便读者进行对比学习。
 
+Hashmap, ConcurrentHashMap
+
 ##### Linux
 
 源码：
@@ -166,6 +168,13 @@ epoll 全称 event poll，是 Linux 内核实现 IO 多路复用 (IO multiplexin
 - nginx/src/core/ngx_rbtree.c
 
 nginx 中的用户态定时器是通过红黑树实现的。在 nginx 中，所有 timer 节点都由一棵红黑树进行维护，在 worker 进程的每一次循环中都会调用 ngx_process_events_and_timers 函数，在该函数中就会调用处理定时器的函数 ngx_event_expire_timers，每次该函数都不断的从红黑树中取出时间值最小的，查看他们是否已经超时，然后执行他们的函数，直到取出的节点的时间没有超时为止
+
+###### ConcurrentHashMap
+
+    ConcurrentHashMap是线程安全的HashMap；在并发的情况下使用HashMap可能会导致死循环，在进行put操作时导致CPU利用率接近100%。是因为在多线程会导致HashMap的Entry链表形成环形数据结构，一旦形成环形数据结构，Entry的next结点永远不能为空，就会产生死循环获取Entry。
+    在JDk1.8中ConcurrentHashMap采用Node + CAS + Synchronized来保证并发情况下的更新不会出现问题。其底层的数据结构是：数组 + 链表 + 红黑树 的方式来实现的。
+
+###### ConcurrentHashMap使用红黑树总结
 
 ###### HashMap
 
